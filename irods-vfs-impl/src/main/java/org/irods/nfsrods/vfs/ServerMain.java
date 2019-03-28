@@ -2,6 +2,7 @@ package org.irods.nfsrods.vfs;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.dcache.nfs.ExportFile;
@@ -13,16 +14,17 @@ import org.dcache.nfs.vfs.VirtualFileSystem;
 import org.dcache.oncrpc4j.rpc.OncRpcProgram;
 import org.dcache.oncrpc4j.rpc.OncRpcSvc;
 import org.dcache.oncrpc4j.rpc.OncRpcSvcBuilder;
-import org.dcache.oncrpc4j.rpc.gss.GssSessionManager;
-import org.ietf.jgss.GSSException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.nfsrods.config.IdMapConfigEntry;
 import org.irods.nfsrods.config.NFSServerConfig;
 import org.irods.nfsrods.config.ServerConfig;
 import org.irods.nfsrods.utils.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 public class ServerMain
 {
@@ -31,6 +33,7 @@ public class ServerMain
     private static final String LOGGER_CONFIG_PATH  = NFSRODS_HOME + "/config/log4j.properties";
     private static final String SERVER_CONFIG_PATH  = NFSRODS_HOME + "/config/server.json";
     private static final String EXPORTS_CONFIG_PATH = NFSRODS_HOME + "/config/exports";
+    private static final String ID_MAP_CONFIG_PATH  = NFSRODS_HOME + "/config/id_map.json";
     // @formatter:on
 
     static
@@ -43,6 +46,7 @@ public class ServerMain
     public static void main(String[] args) throws JargonException
     {
         ServerConfig config = null;
+        List<IdMapConfigEntry> idMapConfig = null;
 
         try
         {
@@ -55,6 +59,17 @@ public class ServerMain
             System.exit(1);
         }
 
+        try
+        {
+            idMapConfig = JSONUtils.fromJSON(new File(ID_MAP_CONFIG_PATH), new TypeReference<List<IdMapConfigEntry>>() {});
+            log_.debug("main :: Id map config ==> {}", JSONUtils.toJSON(idMapConfig));
+        }
+        catch (IOException e)
+        {
+            log_.error("main :: Error reading id map config." + System.lineSeparator() + e.getMessage());
+            System.exit(1);
+        }
+
         NFSServerConfig nfsSvrConfig = config.getNfsServerConfig();
         IRODSFileSystem ifsys = IRODSFileSystem.instance();
         OncRpcSvc nfsSvc = null;
@@ -64,19 +79,14 @@ public class ServerMain
         try
         {
             IRODSAccessObjectFactory ifactory = ifsys.getIRODSAccessObjectFactory();
-            IRODSIdMap idMapper = new IRODSIdMap(config, ifactory);
+            IRODSIdMap idMapper = new IRODSIdMap(config, idMapConfig, ifactory);
 
             // @formatter:off
-            GssSessionManager gssSessionMgr = new GssSessionManager(idMapper,
-                                                                    nfsSvrConfig.getKerberosServicePrincipal(),
-                                                                    nfsSvrConfig.getKerberosKeytab());
-
             nfsSvc = new OncRpcSvcBuilder()
                 .withPort(nfsSvrConfig.getPort())
                 .withTCP()
                 .withAutoPublish()
                 .withWorkerThreadIoStrategy()
-                .withGssSessionManager(gssSessionMgr)
                 .withSubjectPropagation()
                 .build();
 
@@ -107,7 +117,7 @@ public class ServerMain
 
             Thread.currentThread().join();
         }
-        catch (JargonException | IOException | GSSException | InterruptedException e)
+        catch (JargonException | IOException | InterruptedException e)
         {
             log_.error(e.getMessage());
         }
