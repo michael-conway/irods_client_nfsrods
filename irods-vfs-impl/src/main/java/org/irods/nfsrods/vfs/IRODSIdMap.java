@@ -1,17 +1,22 @@
 package org.irods.nfsrods.vfs;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
+import javax.security.auth.Subject;
+
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
+import org.dcache.auth.Subjects;
 import org.dcache.nfs.v4.NfsIdMapping;
+import org.dcache.nfs.v4.NfsLoginService;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.nfsrods.config.IdMapConfigEntry;
 import org.irods.nfsrods.config.ServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IRODSIdMap implements NfsIdMapping//, RpcLoginService
+public class IRODSIdMap implements NfsIdMapping, NfsLoginService//, RpcLoginService
 {
     private static final Logger log_ = LoggerFactory.getLogger(IRODSIdMap.class);
 
@@ -21,16 +26,16 @@ public class IRODSIdMap implements NfsIdMapping//, RpcLoginService
     private final ServerConfig config_;
     private final List<IdMapConfigEntry> idMapConfig_;
     private final IRODSAccessObjectFactory factory_;
-    private Map<String, Integer> principleToUidMap_;
-    private Map<Integer, IRODSUser> uidToPrincipleMap_;
+    private Map<String, Integer> principalToUidMap_;
+    private Map<Integer, IRODSUser> uidToPrincipalMap_;
 
     public IRODSIdMap(ServerConfig _config, List<IdMapConfigEntry> _idMapConfig, IRODSAccessObjectFactory _factory)
     {
         config_ = _config;
         idMapConfig_ = _idMapConfig;
         factory_ = _factory;
-        principleToUidMap_ = new NonBlockingHashMap<>();
-        uidToPrincipleMap_ = new NonBlockingHashMap<>();
+        principalToUidMap_ = new NonBlockingHashMap<>();
+        uidToPrincipalMap_ = new NonBlockingHashMap<>();
         
         initIdMappings();
     }
@@ -40,8 +45,8 @@ public class IRODSIdMap implements NfsIdMapping//, RpcLoginService
         idMapConfig_.forEach(e -> {
             IRODSUser user = new IRODSUser(e.getName(), config_, factory_);
             
-            principleToUidMap_.put(e.getName(), e.getUserId() /* original: user.getUserID() */);
-            uidToPrincipleMap_.put(e.getUserId() /* original: user.getUserID() */, user);
+            principalToUidMap_.put(e.getName(), e.getUserId() /* original: user.getUserID() */);
+            uidToPrincipalMap_.put(e.getUserId() /* original: user.getUserID() */, user);
 
             log_.debug("IRODSIdMap :: userName = {}", e.getName());
         });
@@ -93,6 +98,13 @@ public class IRODSIdMap implements NfsIdMapping//, RpcLoginService
         return Integer.toString(_id);
     }
 
+    @Override
+    public Subject login(Principal _principal)
+    {
+        int uid = principalToUidMap_.get(_principal.getName());
+        return Subjects.of(uid, uid);
+    }
+
 //    @Override
 //    public Subject login(RpcTransport _rpcTransport, GSSContext _gssCtx)
 //    {
@@ -138,6 +150,6 @@ public class IRODSIdMap implements NfsIdMapping//, RpcLoginService
 
     public IRODSUser resolveUser(int _userID)
     {
-        return uidToPrincipleMap_.get(Integer.valueOf(_userID));
+        return uidToPrincipalMap_.get(Integer.valueOf(_userID));
     }
 }
