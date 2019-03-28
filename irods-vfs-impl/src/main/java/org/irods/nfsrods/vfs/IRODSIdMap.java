@@ -150,6 +150,7 @@ public class IRODSIdMap implements NfsIdMapping, NfsLoginService//, RpcLoginServ
 
     public IRODSUser resolveUser(int _userID)
     {
+        log_.debug("resolveUser - _userID = {}", _userID);
         return uidToPrincipalMap_.get(Integer.valueOf(_userID));
     }
 }
