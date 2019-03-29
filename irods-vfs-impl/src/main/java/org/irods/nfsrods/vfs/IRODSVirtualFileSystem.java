@@ -757,12 +757,12 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem
 
             if (objStat.getOwnerName() != null && !objStat.getOwnerName().isEmpty())
             {
-                ownerId = idMapper_.principalToUid(objStat.getOwnerName());
+                ownerId = idMapper_.nameToUid(objStat.getOwnerName());
                 
-                if (IRODSIdMap.NOBODY_UID == ownerId)
-                {
-                    
-                }
+//                if (IRODSIdMap.NOBODY_UID == ownerId)
+//                {
+//                    
+//                }
 
 //                User iuser = uao.findByName(objStat.getOwnerName());
 //                ownerId = Integer.parseInt(iuser.getId());
