@@ -20,8 +20,8 @@ public class IRODSIdMap implements NfsIdMapping, NfsLoginService//, RpcLoginServ
 {
     private static final Logger log_ = LoggerFactory.getLogger(IRODSIdMap.class);
 
-    private static final int NOBODY_UID = 65534;
-    private static final int NOBODY_GID = 65534;
+    public static final int NOBODY_UID = 65534;
+    public static final int NOBODY_GID = 65534;
 
     private final ServerConfig config_;
     private final List<IdMapConfigEntry> idMapConfig_;
@@ -43,7 +43,7 @@ public class IRODSIdMap implements NfsIdMapping, NfsLoginService//, RpcLoginServ
     private void initIdMappings()
     {
         idMapConfig_.forEach(e -> {
-            IRODSUser user = new IRODSUser(e.getName(), config_, factory_);
+            IRODSUser user = new IRODSUser(e.getName(), e.getUserId(), e.getGroupId(), config_, factory_);
             
             principalToUidMap_.put(e.getName(), e.getUserId() /* original: user.getUserID() */);
             uidToPrincipalMap_.put(e.getUserId() /* original: user.getUserID() */, user);

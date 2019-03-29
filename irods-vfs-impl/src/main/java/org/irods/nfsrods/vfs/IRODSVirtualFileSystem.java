@@ -30,9 +30,7 @@ import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
 import org.irods.jargon.core.pub.DataObjectAO;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystemAO;
-import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.domain.ObjStat;
-import org.irods.jargon.core.pub.domain.User;
 import org.irods.jargon.core.pub.domain.UserFilePermission;
 import org.irods.jargon.core.pub.io.FileIOOperations;
 import org.irods.jargon.core.pub.io.IRODSFile;
@@ -751,15 +749,23 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem
 
             setStatMode(_path.toString(), stat, objStat.getObjectType(), user);
 
-            UserAO uao = aof.getUserAO(user.getAccount());
-            int ownerId = getUserID();
-
+//            UserAO uao = aof.getUserAO(user.getAccount());
+//            int ownerId = getUserID();
+            int ownerId = IRODSIdMap.NOBODY_UID;
+            
             log_.debug("vfs::statPath - Owner name  = {}", objStat.getOwnerName());
 
             if (objStat.getOwnerName() != null && !objStat.getOwnerName().isEmpty())
             {
-                User iuser = uao.findByName(objStat.getOwnerName());
-                ownerId = Integer.parseInt(iuser.getId());
+                ownerId = idMapper_.principalToUid(objStat.getOwnerName());
+                
+                if (IRODSIdMap.NOBODY_UID == ownerId)
+                {
+                    
+                }
+
+//                User iuser = uao.findByName(objStat.getOwnerName());
+//                ownerId = Integer.parseInt(iuser.getId());
             }
             
             // TODO Postponed until a decision has been made on standardizing metadata

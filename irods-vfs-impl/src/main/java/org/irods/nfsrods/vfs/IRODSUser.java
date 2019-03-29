@@ -14,7 +14,6 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.DataNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
-import org.irods.jargon.core.pub.domain.User;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.nfsrods.config.IRODSProxyAdminAccountConfig;
 import org.irods.nfsrods.config.IRODSServerConfig;
@@ -35,8 +34,9 @@ public class IRODSUser
     private IRODSAccount proxiedAcct_;
     private IRODSFile rootFile_;
     private int userID_;
+    private int groupID_;
 
-    public IRODSUser(String _username, ServerConfig _config, IRODSAccessObjectFactory _factory)
+    public IRODSUser(String _username, int _uid, int _gid, ServerConfig _config, IRODSAccessObjectFactory _factory)
     {
         inodeToPath_ = new NonBlockingHashMap<>();
         pathToInode_ = new NonBlockingHashMap<>();
@@ -63,8 +63,10 @@ public class IRODSUser
             factory_ = _factory;
             rootFile_ = factory_.getIRODSFileFactory(proxiedAcct_).instanceIRODSFile(rootPath);
 
-            User user = factory_.getUserAO(proxiedAcct_).findByName(_username);
-            userID_ = Integer.parseInt(user.getId());
+//            User user = factory_.getUserAO(proxiedAcct_).findByName(_username);
+//            userID_ = Integer.parseInt(user.getId());
+            userID_ = _uid;
+            groupID_ = _gid;
 
             establishRoot();
         }
@@ -81,6 +83,11 @@ public class IRODSUser
     public int getUserID()
     {
         return this.userID_;
+    }
+
+    public int getGroupID()
+    {
+        return this.groupID_;
     }
 
     public String getAbsolutePath()
