@@ -1,22 +1,17 @@
 package org.irods.nfsrods.vfs;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
-import javax.security.auth.Subject;
-
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
-import org.dcache.auth.Subjects;
 import org.dcache.nfs.v4.NfsIdMapping;
-import org.dcache.nfs.v4.NfsLoginService;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.nfsrods.config.IdMapConfigEntry;
 import org.irods.nfsrods.config.ServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IRODSIdMap implements NfsIdMapping, NfsLoginService//, RpcLoginService
+public class IRODSIdMap implements NfsIdMapping//, NfsLoginService//, RpcLoginService
 {
     private static final Logger log_ = LoggerFactory.getLogger(IRODSIdMap.class);
 
@@ -45,8 +40,8 @@ public class IRODSIdMap implements NfsIdMapping, NfsLoginService//, RpcLoginServ
         idMapConfig_.forEach(e -> {
             IRODSUser user = new IRODSUser(e.getName(), e.getUserId(), e.getGroupId(), config_, factory_);
             
-            principalToUidMap_.put(e.getName(), e.getUserId() /* original: user.getUserID() */);
-            uidToPrincipalMap_.put(e.getUserId() /* original: user.getUserID() */, user);
+            principalToUidMap_.put(e.getName(), e.getUserId());
+            uidToPrincipalMap_.put(e.getUserId(), user);
 
             log_.debug("IRODSIdMap :: userName = {}", e.getName());
         });
@@ -98,56 +93,13 @@ public class IRODSIdMap implements NfsIdMapping, NfsLoginService//, RpcLoginServ
         return Integer.toString(_id);
     }
 
-    @Override
-    public Subject login(Principal _principal)
-    {
-        int uid = principalToUidMap_.get(_principal.getName());
-        return Subjects.of(uid, uid);
-    }
-
 //    @Override
-//    public Subject login(RpcTransport _rpcTransport, GSSContext _gssCtx)
+//    public Subject login(Principal _principal)
 //    {
-//        try
-//        {
-//            String principal = _gssCtx.getSrcName().toString();
-//            Integer rodsUserID = principleUidMap_.get(principal);
-//
-//            // printPrincipalType(principal);
-//
-//            if (rodsUserID == null)
-//            {
-//                String userName = null;
-//
-//                // If the principal represents a service.
-//                if (principal != null && principal.startsWith("nfs/"))
-//                {
-//                    userName = config_.getIRODSProxyAdminAcctConfig().getUsername();
-//                }
-//                else
-//                {
-//                    // KerberosPrincipal kp = new KerberosPrincipal(principal);
-//                    // userName = kp.getName();
-//                    userName = principal.substring(0, principal.indexOf('@'));
-//                    log_.debug("IRODSIdMap :: userName = {}", userName);
-//                }
-//
-//                IRODSUser user = new IRODSUser(userName, config_, factory_);
-//                rodsUserID = user.getUserID();
-//                principleUidMap_.put(principal, rodsUserID);
-//                irodsPrincipleMap_.put(rodsUserID, user);
-//            }
-//
-//            return Subjects.of(rodsUserID, rodsUserID);
-//        }
-//        catch (GSSException e)
-//        {
-//            log_.error(e.getMessage());
-//        }
-//
-//        return Subjects.of(NOBODY_UID, NOBODY_GID);
+//        int uid = principalToUidMap_.get(_principal.getName());
+//        return Subjects.of(uid, uid);
 //    }
-    
+
     public int nameToUid(String _name)
     {
         if (principalToUidMap_.containsKey(_name))
