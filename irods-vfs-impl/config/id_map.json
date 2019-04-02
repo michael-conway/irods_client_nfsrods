@@ -1,7 +1,0 @@
-[
-	{"name": "rods", "uid": 0, "gid": 0},
-	{"name": "kory", "uid": 1000, "gid": 1000},
-	{"name": "lizz", "uid": 1002, "gid": 1002},
-	{"name": "luke", "uid": 1003, "gid": 1003},
-	{"name": "jane", "uid": 1004, "gid": 1004}
-]

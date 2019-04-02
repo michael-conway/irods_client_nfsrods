@@ -63,8 +63,6 @@ public class IRODSUser
             factory_ = _factory;
             rootFile_ = factory_.getIRODSFileFactory(proxiedAcct_).instanceIRODSFile(rootPath);
 
-//            User user = factory_.getUserAO(proxiedAcct_).findByName(_username);
-//            userID_ = Integer.parseInt(user.getId());
             userID_ = _uid;
             groupID_ = _gid;
 

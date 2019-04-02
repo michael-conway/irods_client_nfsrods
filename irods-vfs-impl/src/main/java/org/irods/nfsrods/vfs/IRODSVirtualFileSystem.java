@@ -739,6 +739,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem
             CollectionAndDataObjectListAndSearchAO lao = null;
             lao = aof.getCollectionAndDataObjectListAndSearchAO(user.getAccount());
             ObjStat objStat = lao.retrieveObjectStatForPath(_path.toString());
+
             log_.debug("vfs::statPath - iRODS stat info = {}", objStat);
 
             Stat stat = new Stat();
@@ -749,34 +750,16 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem
 
             setStatMode(_path.toString(), stat, objStat.getObjectType(), user);
 
-//            UserAO uao = aof.getUserAO(user.getAccount());
-//            int ownerId = getUserID();
             int ownerId = IRODSIdMap.NOBODY_UID;
+            int groupId = IRODSIdMap.NOBODY_GID;
             
             log_.debug("vfs::statPath - Owner name  = {}", objStat.getOwnerName());
 
             if (objStat.getOwnerName() != null && !objStat.getOwnerName().isEmpty())
             {
-                ownerId = idMapper_.nameToUid(objStat.getOwnerName());
-                
-//                if (IRODSIdMap.NOBODY_UID == ownerId)
-//                {
-//                    
-//                }
-
-//                User iuser = uao.findByName(objStat.getOwnerName());
-//                ownerId = Integer.parseInt(iuser.getId());
+                ownerId = idMapper_.getUidForUser(objStat.getOwnerName());
+                groupId = idMapper_.getGidForUser(objStat.getOwnerName());
             }
-            
-            // TODO Postponed until a decision has been made on standardizing metadata
-            // attributes (see https://github.com/irods_rfcs/0004_standard_metadata_attributes.md).
-//            int groupId = getGroupIdFromMetaData(user, _path.toString());
-//            
-//            if (-1 == groupId)
-//            {
-//                groupId = ownerId;
-//            }
-            int groupId = ownerId;
             
             stat.setUid(ownerId);
             stat.setGid(groupId);
@@ -808,7 +791,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem
         return Inode.forFile(Longs.toByteArray(_inodeNumber));
     }
 
-    private Path getPath(long _inodeNumber) throws NoEntException
+    private Path getPath(long _inodeNumber) throws IOException
     {
         IRODSUser user = getCurrentIRODSUser();
         Path path = user.getInodeToPathMap().get(_inodeNumber);
@@ -821,7 +804,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem
         return path;
     }
 
-    private long getInodeNumber(Path _path) throws NoEntException
+    private long getInodeNumber(Path _path) throws IOException
     {
         IRODSUser user = getCurrentIRODSUser();
         Long inodeNumber = user.getPathToInodeMap().get(_path);
@@ -935,12 +918,12 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem
         return Integer.parseInt(name);
     }
 
-    private IRODSUser getCurrentIRODSUser()
+    private IRODSUser getCurrentIRODSUser() throws IOException
     {
         return idMapper_.resolveUser(getUserID());
     }
 
-    private void closeCurrentConnection()
+    private void closeCurrentConnection() throws IOException
     {
         IRODSUser user = getCurrentIRODSUser();
         user.getIRODSAccessObjectFactory().closeSessionAndEatExceptions(user.getAccount());
