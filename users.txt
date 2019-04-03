@@ -1,4 +1,0 @@
-kory::::::/bin/bash
-rods::::::/bin/bash
-lizz::::::/bin/bash
-jane::::::/bin/bash
