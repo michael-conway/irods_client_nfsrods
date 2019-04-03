@@ -3,16 +3,14 @@ An [nfs4j](https://github.com/dCache/nfs4j) Virtual File System implementation s
 
 ## Features
 - Configurable
-- Authentication via Kerberos
 - Exposes iRODS through a mount point
 - Clients avoid the need for learning icommands
 - Clients avoid the need to install additional iRODS packages
 - Supports many common *nix commands and software (e.g. mkdir, truncate, cat, vim, etc.)
 
 ## Requirements
-- iRODS v4.2.5
+- iRODS v4.2.5+
 - [iRODS REP for Collection Mtime](https://github.com/irods/irods_rule_engine_plugin_update_collection_mtime)
-- Kerberos
 - Java Development Kit (JDK v8)
 - Maven
 - OS NFS packages (e.g Ubuntu 16.04: nfs-common)
@@ -22,12 +20,6 @@ The following instructions assume you're running Ubuntu 16.04 and Bash.
 
 The root account is only needed when running the software and using mount. It is
 not necessary for compiling.
-
-Clients are expected to have Kerberos principals matching their iRODS account name. For
-example, if a user has an iRODS account with the name **john**, then the Kerberos server should
-have a principal with the name **john@REALM**. This is required because the Kerberos principal
-name is passed through to the iRODS server via the iRODS proxy account. This allows the iRODS
-server to run rules and apply policies based on the client's iRODS account.
 
 ### Compiling
 ```bash
@@ -65,9 +57,7 @@ drwxr-xr-x 2 root root     4096 Sep 13 13:10 maven-archiver
 ```
 
 ### Running
-You must have a running Kerberos server with a valid service principal for
-the NFSRODS server. Make sure to update the NFSRODS server config file with the correct
-iRODS and Kerberos information.
+Make sure to update the NFSRODS server config file with the correct iRODS.
 
 The config file is located at `/path/to/irods_client_nfsrods/irods-vfs-impl/config/server.json`.
 Each config option is explained below.
@@ -80,14 +70,6 @@ Each config option is explained below.
         // this change does require the client to specify the port when creating
         // the mount point (this is demonstrated later).
         "port": 2050,
-        
-        // The Kerberos service principal used to authenticate the NFSRODS
-        // server to the KDC. The prefix, "nfs/", is required.
-        "kerberos_service_principal": "nfs/hostname@REALM",
-        
-        // The absolute path to the Kerberos keytab file containing all principals.
-        // Clients will need to use the same keytab file as required by Kerberos.
-        "kerberos_keytab": "/etc/krb5.keytab",
         
         // The path within iRODS that will represent the root collection.
         // We recommend setting this to the zone. Using the zone as the root
@@ -130,9 +112,8 @@ $ sudo -E java -jar $NFSRODS_HOME/target/nfsrods-1.0.0-SNAPSHOT-jar-with-depende
 
 ### Mounting
 ```bash
-$ kinit -f <iRODS_account_name>
 $ sudo mkdir <mount_point>
-$ sudo mount -o sec=krb5,port=2050 <hostname>:/ <mount_point>
+$ sudo mount -o sec=sys,port=2050 <hostname>:/ <mount_point>
 ```
 
 If you do not receive any errors after mounting, then you should be able to access the mount
@@ -153,7 +134,6 @@ before continuing.
 
 ### Requirements
 - Docker (as of this writing, v18.09.0)
-- Kerberos principal for the iRODS service account (e.g. rods)
 - Bash Automated Testing System (Bats)
 
 ### Building the Docker image
@@ -195,9 +175,8 @@ Bats [here](https://github.com/bats-core/bats-core).
 
 ### Run the Test Suite
 ```bash
-$ kinit -f rods
 $ sudo mkdir /mnt/nfsrods
-$ sudo mount -o sec=krb5,port=2050 <hostname>:/ /mnt/nfsrods
+$ sudo mount -o sec=sys,port=2050 <hostname>:/ /mnt/nfsrods
 $ bats /path/to/irods_client_nfsrods/irods-vfs-impl/testing/behavior_tests.bats
 ```
 
