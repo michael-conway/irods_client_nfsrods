@@ -2,14 +2,17 @@
 
 set -o xtrace
 
+git clone https://github.com/$GITHUB_ACCT/irods_client_nfsrods
 cd /irods_client_nfsrods
 git checkout $GIT_BRANCH
 mvn clean install -Dmaven.test.skip=true
+cd /
 
 mkdir _package && cd _package
 cmake -GNinja /irods_client_nfsrods
 cpack -G "DEB"
 dpkg -i irods*.deb
+cd /
 
 # Create users.
 newusers /nfsrods_ext/users.txt

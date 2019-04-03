@@ -13,7 +13,6 @@ ENV PATH=/opt/irods-externals/cmake3.11.4-0/bin:$PATH
 
 ARG _github_acct="korydraughn"
 ENV GITHUB_ACCT ${_github_acct}
-RUN git clone https://github.com/$GITHUB_ACCT/irods_client_nfsrods
 
 ARG _git_branch="no_krb5_os"
 ENV GIT_BRANCH ${_git_branch}
