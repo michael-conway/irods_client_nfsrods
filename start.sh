@@ -1,11 +1,12 @@
 #! /bin/bash
 
-cd irods_client_nfsrods
+set -o xtrace
+
+cd /irods_client_nfsrods
 git checkout $GIT_BRANCH
 mvn clean install -Dmaven.test.skip=true
 
-mkdir _package
-cd _package
+mkdir _package && cd _package
 cmake -GNinja /irods_client_nfsrods
 cpack -G "DEB"
 dpkg -i irods*.deb
