@@ -21,7 +21,7 @@ RUN cd irods_client_nfsrods && \
 
 RUN mkdir _package && \
     cd _package && \
-    cmake /irods_client_nfsrods && \
+    cmake -GNinja /irods_client_nfsrods && \
     cpack -G "DEB" && \
     dpkg -i irods*.deb
 
