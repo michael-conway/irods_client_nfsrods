@@ -1,11 +1,6 @@
 cmake_minimum_required(VERSION 3.7 FATAL_ERROR)
 project(irods_client_nfsrods LANGUAGES)
 
-set(PACKAGE_VERSION_MAJOR 1)
-set(PACKAGE_VERSION_MINOR 0)
-set(PACKAGE_VERSION_PATCH 0)
-set(PACKAGE_VERSION "${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR}.${PACKAGE_VERSION_PATCH}")
-
 # Package Contents
 # ~~~~~~~~~~~~~~~~
 # /etc/nfsrods/exports
@@ -14,6 +9,24 @@ set(PACKAGE_VERSION "${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR}.${PACKAGE
 # /etc/nfsrods/server.json
 # /opt/irods-clients/nfsrods-1.0.0-SNAPSHOT-jar-with-dependencies.jar
 # /etc/init.d/nfsrods
+
+#if (NOT IRODS_LINUX_DISTRIBUTION_NAME)
+#    execute_process(COMMAND "python" "-c" "from __future__ import print_function; import platform; print(platform.linux_distribution()[0].split()[0].strip().lower(), end='')"
+#                    RESULT_VARIABLE IRODS_EXECUTE_PROCESS_RESULT_LINUX_DISTRIBUTION_NAME
+#                    OUTPUT_VARIABLE IRODS_LINUX_DISTRIBUTION_NAME)
+#
+#    if (NOT ${IRODS_EXECUTE_PROCESS_RESULT_LINUX_DISTRIBUTION_NAME} STREQUAL "0")
+#        message(FATAL_ERROR "Linux platform name detection failed\n${IRODS_EXECUTE_PROCESS_RESULT_LINUX_DISTRIBUTION_NAME}")
+#    endif()
+#
+#    set(IRODS_LINUX_DISTRIBUTION_NAME ${IRODS_LINUX_DISTRIBUTION_NAME} CACHE STRING "Linux distribution name, e.g. {ubuntu, centos, ...}." FORCE)
+#    message(STATUS "Setting unspecified IRODS_LINUX_DISTRIBUTION_NAME to '${IRODS_LINUX_DISTRIBUTION_NAME}'")
+#endif()
+
+set(PACKAGE_VERSION_MAJOR 1)
+set(PACKAGE_VERSION_MINOR 0)
+set(PACKAGE_VERSION_PATCH 0)
+set(PACKAGE_VERSION "${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR}.${PACKAGE_VERSION_PATCH}")
 
 install(FILES ${CMAKE_SOURCE_DIR}/irods-vfs-impl/target/nfsrods-1.0.0-SNAPSHOT-jar-with-dependencies.jar
         DESTINATION /opt/irods-clients/nfsrods
@@ -69,17 +82,14 @@ set(CPACK_RPM_PACKAGE_NAME ${PACKAGE_NAME})
 
 set(CPACK_ARCHIVE_COMPONENT_INSTALL OFF)
 
-if (CPACK_GENERATOR STREQUAL "DEB")
+if (NOT CPACK_GENERATOR)
+    message(FATAL_ERROR "CPACK_GENERATOR not specified. Valid values are DEB or RPM.")
+elseif (CPACK_GENERATOR STREQUAL "DEB")
     set(PACKAGE_DEPENDENCIES "openjdk-8-jre")
     set(CPACK_DEBIAN_PACKAGE_DEPENDS "${PACKAGE_DEPENDENCIES}")
 elseif (CPACK_GENERATOR STREQUAL "RPM")
     set(PACKAGE_DEPENDENCIES "java-1.8.0-openjdk")
     set(CPACK_RPM_PACKAGE_REQUIRES "${PACKAGE_DEPENDENCIES}")
-endif()
-
-if (NOT CPACK_GENERATOR)
-    #set(CPACK_GENERATOR ${IRODS_CPACK_GENERATOR} CACHE STRING "CPack generator to use, e.g. {DEB, RPM, TGZ}." FORCE)
-    #message(STATUS "Setting unspecified CPACK_GENERATOR to ${CPACK_GENERATOR}. This is the correct setting for normal builds.")
 endif()
 
 include(CPack)

@@ -1,10 +1,10 @@
 #! /bin/bash
 
 # Create users.
-./nfsrods_ext/add_users.sh
+newusers /nfsrods_ext/users.txt
 
 # Externally mounted (-v) config files.
-export NFSRODS_HOME=/etc/nfsrods-ext
+export NFSRODS_HOME=/nfsrods_ext
 
 # Run NFS server.
 java -jar /opt/irods-clients/nfsrods-1.0.0-SNAPSHOT-jar-with-dependencies.jar
