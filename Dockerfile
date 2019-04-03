@@ -10,12 +10,22 @@ RUN wget -qO - https://packages.irods.org/irods-signing-key.asc | apt-key add -;
     apt-get install -y irods-dev irods-externals-cmake3.11.4-0
 
 ENV PATH=/opt/irods-externals/cmake3.11.4-0/bin:$PATH
+ENV NFSRODS_HOME=/nfsrods_ext
 
 ARG _github_acct="korydraughn"
-ENV GITHUB_ACCT ${_github_acct}
+RUN git clone https://github.com/${_github_acct}/irods_client_nfsrods
 
-ARG _git_branch="no_krb5_os"
-ENV GIT_BRANCH ${_git_branch}
+ARG _sha="master"
+RUN cd irods_client_nfsrods && \
+    git checkout ${_sha} && \
+    mvn clean install -Dmaven.test.skip=true
+
+RUN mkdir _package && cd _package && \
+    cmake -GNinja /irods_client_nfsrods && \
+    cpack -G "DEB" && \
+    dpkg -i irods*.deb
+
+RUN newusers /nfsrods_ext/users.txt
 
 ADD start.sh /
 RUN chmod +x start.sh
