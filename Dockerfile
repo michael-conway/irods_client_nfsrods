@@ -25,8 +25,6 @@ RUN mkdir _package && cd _package && \
     cpack -G "DEB" && \
     dpkg -i irods*.deb
 
-RUN newusers /nfsrods_ext/users.txt
-
 ADD start.sh /
 RUN chmod +x start.sh
 
