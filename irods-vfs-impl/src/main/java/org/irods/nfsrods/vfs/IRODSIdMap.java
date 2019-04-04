@@ -41,9 +41,10 @@ public class IRODSIdMap implements NfsIdMapping
         principalToUidMap_ = new NonBlockingHashMap<>();
         uidToPrincipalMap_ = new NonBlockingHashMap<>();
         
-        IRODSUser user = new IRODSUser("rods", 0, 0, config_, factory_);
+        IRODSProxyAdminAccountConfig proxyConfig = _config.getIRODSProxyAdminAcctConfig();
+        IRODSUser user = new IRODSUser(proxyConfig.getUsername(), 0, 0, config_, factory_);
 
-        principalToUidMap_.put("rods", 0);
+        principalToUidMap_.put(proxyConfig.getUsername(), 0);
         uidToPrincipalMap_.put(0, user);
     }
 

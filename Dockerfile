@@ -13,9 +13,10 @@ ENV PATH=/opt/irods-externals/cmake3.11.4-0/bin:$PATH
 ENV NFSRODS_HOME=/nfsrods_ext
 
 ARG _github_acct="korydraughn"
+ARG _sha="master"
+
 RUN git clone https://github.com/${_github_acct}/irods_client_nfsrods
 
-ARG _sha="master"
 RUN cd irods_client_nfsrods && \
     git checkout ${_sha} && \
     mvn clean install -Dmaven.test.skip=true
