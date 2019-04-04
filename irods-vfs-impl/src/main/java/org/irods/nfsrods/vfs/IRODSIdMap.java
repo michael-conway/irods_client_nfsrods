@@ -17,7 +17,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 import com.sun.jna.ptr.IntByReference;
 
-public class IRODSIdMap implements NfsIdMapping//, NfsLoginService
+public class IRODSIdMap implements NfsIdMapping
 {
     private static final Logger log_ = LoggerFactory.getLogger(IRODSIdMap.class);
     
@@ -43,7 +43,6 @@ public class IRODSIdMap implements NfsIdMapping//, NfsLoginService
         
         IRODSUser user = new IRODSUser("rods", 0, 0, config_, factory_);
 
-        //principalToUidMap_.put("root", 0);
         principalToUidMap_.put("rods", 0);
         uidToPrincipalMap_.put(0, user);
     }
@@ -54,18 +53,6 @@ public class IRODSIdMap implements NfsIdMapping//, NfsLoginService
         log_.debug("principalToGid :: _principal = {}", _principal);
         
         return Integer.parseInt(_principal);
-
-//        __group g = libc_.getgrnam(_principal);
-//        
-//        if (g == null)
-//        {
-//            log_.debug("principalToGid :: Group not found. Returning GID {}", NOBODY_GID);
-//            return NOBODY_GID;
-//        }
-//
-//        log_.debug("principalToGid :: Group found! Returning GID {}", g.gid);
-//
-//        return g.gid;
     }
 
     @Override
@@ -74,18 +61,6 @@ public class IRODSIdMap implements NfsIdMapping//, NfsLoginService
         log_.debug("gidToPrincipal :: _id = {}", _id);
         
         return String.valueOf(_id);
-
-//        __group g = libc_.getgrgid(_id);
-//        
-//        if (g == null)
-//        {
-//            log_.debug("gidToPrincipal :: Group not found. Returning name {}", NOBODY_GROUP);
-//            return NOBODY_GROUP;
-//        }
-//
-//        log_.debug("gidToPrincipal :: Group found! Returning name {}", g.name);
-//
-//        return g.name;
     }
 
     @Override
@@ -94,18 +69,6 @@ public class IRODSIdMap implements NfsIdMapping//, NfsLoginService
         log_.debug("principalToUid :: _principal = {}", _principal);
         
         return Integer.parseInt(_principal);
-
-//        __password p = libc_.getpwnam(_principal);
-//        
-//        if (p == null)
-//        {
-//            log_.debug("principalToUid :: User not found. Returning UID {}", NOBODY_UID);
-//            return NOBODY_UID;
-//        }
-//
-//        log_.debug("principalToUid :: User found! Returning UID {}", p.uid);
-//
-//        return p.uid;
     }
 
     @Override
@@ -114,26 +77,7 @@ public class IRODSIdMap implements NfsIdMapping//, NfsLoginService
         log_.debug("uidToPrincipal :: _id = {}", _id);
 
         return String.valueOf(_id);
-        
-//        __password p = libc_.getpwuid(_id);
-//        
-//        if (p == null)
-//        {
-//            log_.debug("uidToPrincipal :: User not found. Returning name {}", NOBODY_USER);
-//            return NOBODY_USER;
-//        }
-//        
-//        log_.debug("uidToPrincipal :: User found. Returning name {}", p.name);
-//
-//        return p.name;
     }
-
-//    @Override
-//    public Subject login(Principal _principal)
-//    {
-//        String name = _principal.getName();
-//        return Subjects.of(principalToUidMap_.get(name), getGidForUser(name));
-//    }
 
     public int getUidForUser(String _name)
     {
@@ -142,7 +86,17 @@ public class IRODSIdMap implements NfsIdMapping//, NfsLoginService
             return principalToUidMap_.get(_name);
         }
         
-        return NOBODY_UID;
+        __password p = libc_.getpwnam(_name);
+        
+        if (p == null)
+        {
+            log_.debug("getUidForUser :: User not found. Returning uid {}", NOBODY_UID);
+            return NOBODY_UID;
+        }
+        
+        log_.debug("getUidForUser :: User found! Returning uid {}", p.uid);
+
+        return p.uid;
     }
     
     public int getGidForUser(String _name)

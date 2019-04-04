@@ -8,13 +8,13 @@
 
     "irods_server": {
         "zone": "tempZone",
-        "host": "<hostname>",
-        "port": 9000,
+        "host": "kdd-ws",
+        "port": 1247,
         "default_resource": "demoResc"
     },
 
     "irods_proxy_admin_account": {
-        "username": "<username>",
-        "password": "<password>"
+        "username": "rods",
+        "password": "rods"
     }
 }
