@@ -6,6 +6,7 @@ import java.util.Map;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
 import org.dcache.nfs.v4.NfsIdMapping;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
+import org.irods.nfsrods.config.IRODSProxyAdminAccountConfig;
 import org.irods.nfsrods.config.ServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
