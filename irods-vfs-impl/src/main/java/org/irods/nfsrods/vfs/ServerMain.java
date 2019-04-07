@@ -25,10 +25,10 @@ import org.slf4j.LoggerFactory;
 public class ServerMain
 {
     // @formatter:off
-    private static final String NFSRODS_HOME        = System.getenv("NFSRODS_HOME");
-    private static final String LOGGER_CONFIG_PATH  = NFSRODS_HOME + "/config/log4j.properties";
-    private static final String SERVER_CONFIG_PATH  = NFSRODS_HOME + "/config/server.json";
-    private static final String EXPORTS_CONFIG_PATH = NFSRODS_HOME + "/config/exports";
+    private static final String NFSRODS_CONFIG_HOME = System.getenv("NFSRODS_CONFIG_HOME");
+    private static final String LOGGER_CONFIG_PATH  = NFSRODS_CONFIG_HOME + "/log4j.properties";
+    private static final String SERVER_CONFIG_PATH  = NFSRODS_CONFIG_HOME + "/server.json";
+    private static final String EXPORTS_CONFIG_PATH = NFSRODS_CONFIG_HOME + "/exports";
     // @formatter:on
 
     static
