@@ -50,6 +50,8 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem
     private static final Logger log_ = LoggerFactory.getLogger(IRODSVirtualFileSystem.class);
 
     private final IRODSIdMap idMapper_;
+    
+    private static final long FIXED_TIMESTAMP = System.currentTimeMillis();
 
     public IRODSVirtualFileSystem(IRODSIdMap _idMapper) throws DataNotFoundException, JargonException
     {
@@ -744,10 +746,7 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem
 
             Stat stat = new Stat();
 
-            stat.setATime(objStat.getModifiedAt().getTime());
-            stat.setCTime(objStat.getCreatedAt().getTime());
-            stat.setMTime(objStat.getModifiedAt().getTime());
-
+            setTime(stat, objStat);
             setStatMode(_path.toString(), stat, objStat.getObjectType(), user);
 
             int ownerId = IRODSIdMap.NOBODY_UID;
@@ -783,6 +782,22 @@ public class IRODSVirtualFileSystem implements VirtualFileSystem
         {
             log_.error(e.getMessage());
             throw new IOException(e);
+        }
+    }
+
+    private void setTime(Stat _stat, ObjStat _objStat)
+    {
+        if (_objStat.getObjectType() == ObjectType.COLLECTION_HEURISTIC_STANDIN)
+        {
+            _stat.setATime(FIXED_TIMESTAMP);
+            _stat.setCTime(FIXED_TIMESTAMP);
+            _stat.setMTime(FIXED_TIMESTAMP);
+        }
+        else
+        {
+            _stat.setATime(_objStat.getModifiedAt().getTime());
+            _stat.setCTime(_objStat.getCreatedAt().getTime());
+            _stat.setMTime(_objStat.getModifiedAt().getTime());
         }
     }
 
