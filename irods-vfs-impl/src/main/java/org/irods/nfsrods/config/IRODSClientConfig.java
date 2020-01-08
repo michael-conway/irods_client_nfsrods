@@ -14,6 +14,7 @@ public class IRODSClientConfig
     @JsonProperty("default_resource")              private String defResc_;
     @JsonProperty("ssl_negotiation_policy")        private String sslNegPolicy_;
     @JsonProperty("connection_timeout_in_seconds") private int connTimeout_;
+    @JsonProperty("connection_management")         private ConnectionManagementConfig connMgmConfig_;
     @JsonProperty("proxy_admin_account")           private IRODSProxyAdminAccountConfig proxyAdminAcctConfig_;
     
     // @formatter:off
@@ -24,6 +25,7 @@ public class IRODSClientConfig
                       @JsonProperty("default_resource")              String _defaultResource,
                       @JsonProperty("ssl_negotiation_policy")        String _sslNegotiationPolicy,
                       @JsonProperty("connection_timeout_in_seconds") Integer _connTimeout,
+                      @JsonProperty("connection_management")         ConnectionManagementConfig _connMgmConfig,
                       @JsonProperty("proxy_admin_account")           IRODSProxyAdminAccountConfig _proxyAdminAcctConfig)
     {
         ConfigUtils.throwIfNull(_host, "host");
@@ -78,6 +80,12 @@ public class IRODSClientConfig
     public int getConnectionTimeout()
     {
         return connTimeout_;
+    }
+    
+    @JsonIgnore
+    public ConnectionManagementConfig getConnectionManagementConfig()
+    {
+        return connMgmConfig_;
     }
 
     @JsonIgnore

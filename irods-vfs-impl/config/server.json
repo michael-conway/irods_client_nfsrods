@@ -14,6 +14,17 @@
         "default_resource": "demoResc",
         "ssl_negotiation_policy": "CS_NEG_REFUSE",
         "connection_timeout_in_seconds": 600,
+
+        "connection_management": {
+            "mode": "simple | cache | proxy",
+            "cache_minimum_evictable_idle_time_in_milliseconds": 60000,
+            "cache_soft_minimum_evictable_idle_time_in_milliseconds": 30000,
+            "cache_maximum_idle_connections_per_key": 100,
+            "cache_test_on_return": false,
+            "cache_test_on_borrow": true,
+            "cache_enable_jmx": false
+        },
+
         "proxy_admin_account": {
             "username": "<username>",
             "password": "<password>"

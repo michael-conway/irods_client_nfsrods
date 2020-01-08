@@ -23,6 +23,7 @@ import org.irods.jargon.core.connection.SettableJargonProperties;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.nfsrods.config.ConnectionManagementConfig;
 import org.irods.nfsrods.config.NFSServerConfig;
 import org.irods.nfsrods.config.ServerConfig;
 import org.irods.nfsrods.utils.JSONUtils;
@@ -79,6 +80,7 @@ public class ServerMain
 
         configureSslNegotiationPolicy(config, ifsys);
         configureConnectionTimeout(config, ifsys);
+        configureConnectionManagement(config, ifsys);
 
         Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHandler<>(ifsys, "Closing iRODS connections")));
 
@@ -164,6 +166,16 @@ public class ServerMain
         SettableJargonProperties props = new SettableJargonProperties(session.getJargonProperties());
         props.setNegotiationPolicy(sslNegPolicy);
         session.setJargonProperties(props);
+    }
+    
+    private static void configureConnectionManagement(ServerConfig _config, IRODSFileSystem _ifsys)
+    {
+        ConnectionManagementConfig connMgmConfig = _config.getIRODSClientConfig().getConnectionManagementConfig();
+        
+        if (ConnectionManagementConfig.MODE_CACHE.equals(connMgmConfig.getMode()))
+        {
+            // TODO
+        }
     }
 
     private static void close(Object _obj)
