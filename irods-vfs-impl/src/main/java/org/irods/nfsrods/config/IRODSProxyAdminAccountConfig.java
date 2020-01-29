@@ -6,33 +6,31 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class IRODSProxyAdminAccountConfig
-{
-    @JsonProperty("username") private String username_;
-    @JsonProperty("password") private String password_;
-    
-    // @formatter:off
-    @JsonCreator
-    IRODSProxyAdminAccountConfig(@JsonProperty("username") String _username,
-                                 @JsonProperty("password") String _password)
-    {
-        ConfigUtils.throwIfNull(_username, "username");
-        ConfigUtils.throwIfNull(_password, "password");
+public class IRODSProxyAdminAccountConfig {
+	@JsonProperty("username")
+	private String username_;
+	@JsonProperty("password")
+	private String password_;
 
-        username_ = _username;
-        password_ = _password;
-    }
-    // @formatter:on
+	// @formatter:off
+	@JsonCreator
+	public IRODSProxyAdminAccountConfig(@JsonProperty("username") String _username,
+			@JsonProperty("password") String _password) {
+		ConfigUtils.throwIfNull(_username, "username");
+		ConfigUtils.throwIfNull(_password, "password");
 
-    @JsonIgnore
-    public String getUsername()
-    {
-        return username_;
-    }
+		username_ = _username;
+		password_ = _password;
+	}
+	// @formatter:on
 
-    @JsonIgnore
-    public String getPassword()
-    {
-        return password_;
-    }
+	@JsonIgnore
+	public String getUsername() {
+		return username_;
+	}
+
+	@JsonIgnore
+	public String getPassword() {
+		return password_;
+	}
 }

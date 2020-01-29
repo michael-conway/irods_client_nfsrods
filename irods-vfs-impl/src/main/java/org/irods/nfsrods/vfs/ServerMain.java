@@ -62,7 +62,6 @@ public class ServerMain {
 		}
 
 		ServerConfig config = null;
-		IRODSFileSystem ifsys = null;
 
 		try {
 			config = JSONUtils.fromJSON(new File(SERVER_CONFIG_PATH), ServerConfig.class);
@@ -72,8 +71,14 @@ public class ServerMain {
 			System.exit(1);
 		}
 
-		NFSServerConfig nfsSvrConfig = config.getNfsServerConfig();
+		runWithServerConfig(config);
+
+	}
+
+	public static void runWithServerConfig(final ServerConfig config) throws JargonException {
 		OncRpcSvc nfsSvc = null;
+		NFSServerConfig nfsSvrConfig = config.getNfsServerConfig();
+		IRODSFileSystem ifsys = null;
 
 		log_.info("config:{}", config);
 		if (ConnectionManagementConfig.MODE_SIMPLE
@@ -93,7 +98,6 @@ public class ServerMain {
 
 		configureSslNegotiationPolicy(config, ifsys);
 		configureConnectionTimeout(config, ifsys);
-		configureConnectionManagement(config, ifsys);
 
 		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHandler<>(ifsys, "Closing iRODS connections")));
 
@@ -138,7 +142,7 @@ public class ServerMain {
 	 * @return {@link IRODSFileSystem} supporting a cached connection manager
 	 * @throws JargonException {@link JargonException}
 	 */
-	private static IRODSFileSystem standupCachedConnectionMode(NFSServerConfig nfsSvrConfig) throws JargonException {
+	public static IRODSFileSystem standupCachedConnectionMode(NFSServerConfig nfsSvrConfig) throws JargonException {
 		/*
 		 * Get a vanilla IRODSFileSystem and then decorate it with a pooled protocol
 		 * manager
@@ -165,7 +169,7 @@ public class ServerMain {
 	 * @return {@link IRODSFileSystem} supporting a simple connection manager
 	 * @throws JargonException {@link JargonException}
 	 */
-	private static IRODSFileSystem standupSimpleConnectionMode(NFSServerConfig nfsSvrConfig) throws JargonException {
+	public static IRODSFileSystem standupSimpleConnectionMode(NFSServerConfig nfsSvrConfig) throws JargonException {
 		return IRODSFileSystem.instance();
 	}
 
@@ -204,14 +208,6 @@ public class ServerMain {
 		SettableJargonProperties props = new SettableJargonProperties(session.getJargonProperties());
 		props.setNegotiationPolicy(sslNegPolicy);
 		session.setJargonProperties(props);
-	}
-
-	private static void configureConnectionManagement(ServerConfig _config, IRODSFileSystem _ifsys) {
-		ConnectionManagementConfig connMgmConfig = _config.getIRODSClientConfig().getConnectionManagementConfig();
-
-		if (ConnectionManagementConfig.MODE_CACHE.equals(connMgmConfig.getMode())) {
-			// TODO
-		}
 	}
 
 	private static void close(Object _obj) {

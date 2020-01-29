@@ -6,33 +6,31 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ServerConfig
-{
-    @JsonProperty("nfs_server")   private NFSServerConfig nfsServerConfig_;
-    @JsonProperty("irods_client") private IRODSClientConfig iRODSClientConfig_;
-    
-    // @formatter:off
-    @JsonCreator
-    ServerConfig(@JsonProperty("nfs_server")   NFSServerConfig _nfsServerConfig,
-                 @JsonProperty("irods_client") IRODSClientConfig _iRODSClientConfig)
-    {
-        ConfigUtils.throwIfNull(_nfsServerConfig, "nfs_server");
-        ConfigUtils.throwIfNull(_iRODSClientConfig, "irods_client");
+public class ServerConfig {
+	@JsonProperty("nfs_server")
+	private NFSServerConfig nfsServerConfig_;
+	@JsonProperty("irods_client")
+	private IRODSClientConfig iRODSClientConfig_;
 
-        nfsServerConfig_ = _nfsServerConfig;
-        iRODSClientConfig_ = _iRODSClientConfig;
-    }
-    // @formatter:on
+	// @formatter:off
+	@JsonCreator
+	public ServerConfig(@JsonProperty("nfs_server") NFSServerConfig _nfsServerConfig,
+			@JsonProperty("irods_client") IRODSClientConfig _iRODSClientConfig) {
+		ConfigUtils.throwIfNull(_nfsServerConfig, "nfs_server");
+		ConfigUtils.throwIfNull(_iRODSClientConfig, "irods_client");
 
-    @JsonIgnore
-    public NFSServerConfig getNfsServerConfig()
-    {
-        return nfsServerConfig_;
-    }
+		nfsServerConfig_ = _nfsServerConfig;
+		iRODSClientConfig_ = _iRODSClientConfig;
+	}
+	// @formatter:on
 
-    @JsonIgnore
-    public IRODSClientConfig getIRODSClientConfig()
-    {
-        return iRODSClientConfig_;
-    }
+	@JsonIgnore
+	public NFSServerConfig getNfsServerConfig() {
+		return nfsServerConfig_;
+	}
+
+	@JsonIgnore
+	public IRODSClientConfig getIRODSClientConfig() {
+		return iRODSClientConfig_;
+	}
 }
