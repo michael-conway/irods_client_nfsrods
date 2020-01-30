@@ -45,7 +45,7 @@ public class IRODSClientConfig {
 		defResc_ = _defaultResource;
 		sslNegPolicy_ = _sslNegotiationPolicy;
 		proxyAdminAcctConfig_ = _proxyAdminAcctConfig;
-
+		connMgmConfig_ = _connMgmConfig;
 		setConnectionTimeout(_connTimeout);
 	}
 	// @formatter:on

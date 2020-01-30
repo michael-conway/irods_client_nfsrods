@@ -21,6 +21,7 @@ import org.irods.jargon.core.connection.ClientServerNegotiationPolicy.SslNegotia
 import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.connection.SettableJargonProperties;
 import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.exception.JargonRuntimeException;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.pool.conncache.CachedIrodsProtocolManager;
@@ -131,6 +132,7 @@ public class ServerMain {
 			Thread.currentThread().join();
 		} catch (JargonException | IOException | InterruptedException e) {
 			log_.error(e.getMessage());
+			throw new JargonRuntimeException("error launching NFS server", e);
 		}
 	}
 

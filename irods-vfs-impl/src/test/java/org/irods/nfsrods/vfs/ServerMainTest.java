@@ -98,4 +98,28 @@ public class ServerMainTest {
 
 	}
 
+	@Test
+	public void testStandupPooledViaServerConfig() throws Exception {
+
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount proxyAccount = testingPropertiesHelper.buildIRODSAdminAccountFromTestProperties(testingProperties);
+		JargonProperties jargonProperties = irodsFileSystem.getJargonProperties();
+		IRODSProxyAdminAccountConfig irodsProxyAdminAccountConfig = new IRODSProxyAdminAccountConfig(
+				proxyAccount.getUserName(), proxyAccount.getPassword());
+		NFSServerConfig nfsServerConfig = new NFSServerConfig(new Integer(2049),
+				MiscIRODSUtils.buildIRODSUserHomeForAccountUsingDefaultScheme(irodsAccount), new Integer(3600000),
+				new Integer(1000), new Integer(1000));
+		ConnectionManagementConfig connectionManagementConfig = new ConnectionManagementConfig(
+				ConnectionManagementConfig.MODE_CACHE, 0, 0, 0, false, false, false);
+		IRODSClientConfig irodsClientConfig = new IRODSClientConfig(irodsAccount.getHost(), irodsAccount.getPort(),
+				irodsAccount.getZone(), irodsAccount.getDefaultStorageResource(),
+				irodsFileSystem.getJargonProperties().getNegotiationPolicy().toString(),
+				jargonProperties.getIRODSSocketTimeout(), connectionManagementConfig, irodsProxyAdminAccountConfig);
+
+		ServerConfig serverConfig = new ServerConfig(nfsServerConfig, irodsClientConfig);
+
+		ServerMain.runWithServerConfig(serverConfig);
+
+	}
+
 }
